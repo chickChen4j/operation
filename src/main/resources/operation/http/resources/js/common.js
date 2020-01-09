@@ -31,7 +31,7 @@ druid.common = function () {
           //   '	powered by <a href="https://github.com/alibaba/" target="_blank">Alibaba</a> & sandzhang & <a href="http://melin.iteye.com/" target="_blank">melin</a> & <a href="https://github.com/shrekwang" target="_blank">shrek.wang</a>'+
           //   '			</div>'+
           // ' </footer>';
-          'Copyright&copy;2019 5Star 研发交付部' +
+          'Copyright&copy;2019 chickChen' +
           '</div>' +
           '</footer>';
       $(document.body).append(html);

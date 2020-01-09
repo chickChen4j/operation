@@ -79,7 +79,7 @@
   
 ```xml
 <OperationApplication>
-  <api id="status" groupId="订单" type="restful" bean="com.efivestar.bpm.dto.StatusDTO"
+  <api id="status" groupId="订单" type="restful" bean="com.chick.bpm.dto.StatusDTO"
     primaryKey="id">
     <insert>
       insert into
