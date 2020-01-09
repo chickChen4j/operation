@@ -36,7 +36,7 @@
         deny: 127.0.0.1,127.0.0.2 # 访问ip黑名单
         allow: 127.0.0.1,127.0.0.2 # 访问ip白名单
         export:
-          url: http://api-t.efivestar.com:12351/uploadFile #下载中心地址,可忽略
+          url: <downloadCenter> #下载中心地址
       
     ```   
 
