@@ -1,0 +1,2202 @@
+<!doctype html>
+<html>
+<head>
+  <title>Operation Index</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf8"/>
+  <link href='css/bootstrap.min.css' rel="stylesheet"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet"/>
+  <link href="css/toastr.min.css" type="text/css" rel="stylesheet"/>
+  <link href="css/bootstrap-table.min.css" type="text/css" rel="stylesheet"/>
+  <link href="css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
+  <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/codemirror/4.10.0/codemirror.min.css" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/codemirror/4.10.0/addon/hint/show-hint.css" type="text/css"
+        rel="stylesheet">
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/toastr.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap-table.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap-table-zh-CN.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap-table-export.min.js"></script>
+  <script type="text/javascript" src="js/tableExport.min.js"></script>
+  <script src="js/common.js" type="text/javascript" charset="utf8"></script>
+  <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+  <script type="text/javascript"
+          src="https://cdn.bootcss.com/codemirror/4.10.0/codemirror.min.js"></script>
+  <script type="text/javascript"
+          src="https://cdn.bootcss.com/codemirror/4.10.0/mode/sql/sql.min.js"></script>
+  <script type="text/javascript"
+          src="https://cdn.bootcss.com/codemirror/4.10.0/addon/hint/show-hint.js"></script>
+  <script type="text/javascript"
+          src="https://cdn.bootcss.com/codemirror/4.10.0/addon/hint/sql-hint.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <!--header-->
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a href="#" target="_blank" class="brand lang" langKey="">五星应用运维后台</a>
+        <div class="nav-collapse">
+          <ul id="header" class="nav nav-tabs">
+
+          </ul>
+        </div>
+        <div id="account" class="dropdown">
+          <span class="icon-user"></span>
+          <span id="accountName" class="dropdown-toggle" data-toggle="dropdown">未知</span>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            <li><a tabindex="-1" href="#"><span class="icon-remove"></span> 退出登录</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--表单区域-->
+  <div id="accordion">
+    <div class="card">
+      <div class="card-header row-fluid">
+        <div class="span4">
+          <!--面包屑-->
+          <ul class="breadcrumb"
+              style="background-color:#fff;padding-left: 0px;margin-bottom: 8px;">
+            <li>首页 <span class="divider">/</span></li>
+            <li>暂无 <span class="divider">/</span></li>
+            <li class="active">暂无</li>
+          </ul>
+        </div>
+        <div class="span8" style="text-align:right;">
+          <a id="collapseBtn" class="btn card-link inline" data-toggle="collapse" href="#collapse">
+            显示表单
+            <span class="caret"></span>
+          </a>
+        </div>
+      </div>
+      <h3 id="apiTitle"></h3>
+      <div id="collapse" class="collapse show" data-parent="#accordion" data-spy="scroll">
+        <div class="card-body">
+          <form class="form-horizontal" role="form">
+            <div class="row-fluid">
+              <div id="form" class="span10">
+              </div>
+              <div id="button" class="span2"
+                   style="border-left:1px solid #E5E5E5;padding-left: 20px">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--表格区域-->
+  <div>
+    <!--下载任务列表-->
+    <div id="toolbar" class="dropdown">
+      <button id="taskBtn" class="btn" class="dropdown-toggle" data-toggle="dropdown"
+              data-target="#">
+        下载任务列表
+        <span class="caret"></span>
+      </button>
+      <ul id="taskList" class="dropdown-menu" style="border-radius:0px;padding:0px 0px;" role="menu"
+          aria-labelledby="dLabel" data-stopPropagation="true">
+        <li style="text-align: center">空空如也</li>
+      </ul>
+    </div>
+    <table id="mytab"></table>
+  </div>
+  <!-- Modal -->
+  <div id="myModal" class="modal hide fade modal-lg" tabindex="-1" role="dialog"
+       aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">新增</h3>
+    </div>
+    <form class="form-horizontal" role="form">
+      <div id="modalBody" class="modal-body">
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+      <button id="modalOk" class="btn btn-primary">确定</button>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  $.namespace("operation.index");
+  operation.index = function () {
+    var index = 0;
+    var xmlConfig = [];
+    var edit = "编辑";
+    var add = "新增";
+    var op = "操作";
+    var accountKey = "account";
+    var datePickerArray = [];
+    var codeMirror = '';
+    return {
+      init: function () {
+        this.ajaxRequestForBasicInfo(this.renderHeader,
+            this.renderForm, this.renderTitle, this.renderButton,
+            this.renderBreadCrumb, this.renderMyTab);
+      },
+      getAccountKey: function () {
+        return accountKey;
+      },
+      getEdit: function () {
+        return edit;
+      },
+      getAdd: function () {
+        return add;
+      },
+      getUrl: function () {
+        var api = this.getApi();
+        var url = api.url;
+        if (url && url.length > 0 && url.indexOf("/") !== 0) {
+          url = "/" + url
+        }
+        if (api) {
+          var prefix = api.prefix;
+          return (prefix.startsWith("/") ? "" : "/") + prefix + (api.type === "RESTFUL" ? "/rest"
+              : "") + "/" + api.id
+              + (api.type === "BASE" && url && url.length > 0 ? url : "");
+        }
+      },
+      getXmlConfig: function () {
+        return xmlConfig;
+      },
+      getIndex: function () {
+        return index;
+      },
+      setCodeMirror: function (editor) {
+        codeMirror = editor;
+      },
+      getCodeMirror: function () {
+        return codeMirror;
+      },
+      setIndex: function (currentIndex) {
+        index = currentIndex;
+      },
+      getDataPicker: function () {
+        return datePickerArray;
+      },
+      setDataPicker: function (datePickerData) {
+        datePickerArray = datePickerData;
+      },
+      getApi: function () {
+        if (xmlConfig && xmlConfig.length > index) {
+          return xmlConfig[index];
+        }
+      },
+      getApiByName: function (name) {
+        if (xmlConfig && xmlConfig.length > 0) {
+          return xmlConfig.find(function (item) {
+            return item.id === name;
+          })
+        }
+      },
+      getSql: function (type, selectType) {
+        var api = this.getApi();
+        if (api && api.sqls && api.sqls.length > 0) {
+          return selectType ? api.sqls.find(function (sql) {
+            return sql && sql.type === type && sql.selectType === selectType;
+          }) : api.sqls.find(function (sql) {
+            return sql && sql.type === type;
+          });
+        }
+      },
+      getInsertSql: function () {
+        return this.getSql("INSERT");
+      },
+      getUpdateSql: function () {
+        return this.getSql("UPDATE");
+      },
+      getDeleteSql: function () {
+        return this.getSql("DELETE");
+      },
+      getSelectSql: function () {
+        return this.getSelectPageSql() || this.getSelectListSql() || this.getSelectOneSql();
+      },
+      getSelectOneSql: function () {
+        return this.getSql("SELECT", "ONE");
+      },
+      getSelectListSql: function () {
+        return this.getSql("SELECT", "LIST");
+      },
+      getSelectPageSql: function () {
+        return this.getSql("SELECT", "PAGE");
+      },
+      clickEdit: function (row, type) {
+        if (type === 1) {
+          $("#myModalLabel").text(edit + "api配置");
+          this.renderConfigurationModal("UPDATE", "api", row);
+        } else if (type === 2) {
+          $("#myModalLabel").text(edit + "sql配置");
+          this.renderConfigurationModal("UPDATE", "sql", row);
+        } else if (type === 3) {
+          $("#myModalLabel").text(edit);
+          this.renderModal("UPDATE", row);
+        }
+      },
+      clickAdd: function (type) {
+        if (type === 1) {
+          $("#myModalLabel").text(add + "api配置");
+          this.renderConfigurationModal("INSERT", "api");
+        } else if (type === 2) {
+          $("#myModalLabel").text(add + "sql配置");
+          this.renderConfigurationModal("INSERT", "sql");
+        } else if (type === 3) {
+          $("#myModalLabel").text(add);
+          this.renderModal("INSERT");
+        }
+      },
+      clickOp: function (type) {
+        $("#myModalLabel").text(op);
+        this.renderModal(type, {});
+      },
+      renderBreadCrumb: function () {
+        $(".breadcrumb li:eq(1)").html(xmlConfig[index].groupId
+            + " <span class='divider'>/</span>");
+        $(".breadcrumb li:eq(2)").html(xmlConfig[index].id);
+      },
+      renderButton: function () {
+        $("#button").empty();
+        var api = operation.index.getApi();
+        var addSql = operation.index.getInsertSql();
+        var selectSql = operation.index.getSelectSql();
+        var deleteSql = operation.index.getDeleteSql();
+        var updateSql = operation.index.getUpdateSql();
+        var str = "";
+        if (addSql) {
+          if (api.id === "api" || api.id === "sql") {
+            // 写死的modal处理
+            if (api.id === "api") {
+              str += '<button id="addBtn" type="button" class="btn btn-success btn-block"'
+                  + '  data-toggle="modal" data-target="#myModal" onclick="clickAddBtn(1)">新增'
+                  + '</button>';
+            } else if (api.id === "sql") {
+              str += '<button id="addBtn" type="button" class="btn btn-success btn-block"'
+                  + '  data-toggle="modal" data-target="#myModal" onclick="clickAddBtn(2)">新增'
+                  + '</button>';
+            }
+          } else {
+            api.type === "RESTFUL"
+            && (str += '<button id="addBtn" type="button" class="btn btn-success btn-block"'
+                + '  data-toggle="modal" data-target="#myModal" onclick="clickAddBtn(3)">新增'
+                + '</button>');
+          }
+        }
+        if (selectSql) {
+          str += '<button id="searchBtn" type="button" class="btn btn-primary btn-block" onclick="clickSearchBtn()">查询</button>'
+              + '<button type="reset" class="btn btn-block" >重置</button>';
+        }
+        if (api.type === "BASE" && !selectSql) {
+          var opSql = addSql || updateSql || deleteSql;
+          if (opSql) {
+            str += '<button id="baseBtn" type="button" class="btn btn-success btn-block"'
+                + '  data-toggle="modal" data-target="#myModal" onclick="operation.index.clickOp(\''
+                + opSql.type + '\')">执行'
+                + '</button>';
+          }
+        }
+        if (str.length > 0) {
+          $("#button").append(str);
+        }
+      },
+      renderConfigurationModal: function (type, configType, row) {
+        $("#modalBody").empty();
+        var str = '';
+        getAllApiData("api", function (apiDataArr) {
+          var str = '<option value="">请选择API名称</option>';
+          apiDataArr.forEach(function (item) {
+            str += '<option value="' + item.id + '">' + item.name
+                + '</option>';
+          })
+          $("#modalBody select#apiId").html(str);
+          $("#modalBody #apiId").val(row["apiId"]);
+        })
+        if (configType === 'sql') {
+          // sql处理--apiId
+          str += '<div class="span6 control-group"><label class="control-label" for="apiId" style="margin-left: 20px">API</label><div class="controls" style="text-align: right">'
+              + ' <select id="apiId" style="width: 164px"></select></div></div>'
+          // 返回类型
+          str += '<div class="span6 control-group"><label class="control-label" for="resultType" style="margin-left: 20px">返回类型</label><div class="controls" style="text-align: right">'
+              + ' <input id="resultType" type="text" placeholder="可选填" '
+              + (row && row.type && row.type !== 'SELECT' ? ' disabled ' : '') + '/>'
+              + ' </div></div>';
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+          str = '';
+          // SQL类型
+          str += '<div class="span6 control-group"><label class="control-label" for="type" style="margin-left: 20px">SQL类型</label><div class="controls" style="text-align: right">'
+              + ' <select id="type" style="width: 164px" onchange="selectOnchangSql(this)">'
+          var options = [{name: "请选择SQL类型", value: ""}, {name: "UPDATE", value: "UPDATE"}, {
+            name: "DELETE",
+            value: "DELETE"
+          }, {name: "INSERT", value: "INSERT"}, {name: "SELECT", value: "SELECT"}, {
+            name: "UNKNOWN",
+            value: "UNKNOWN"
+          }]
+          options.forEach(function (item) {
+            str += '<option value="' + item.value + '">' + item.name + '</option>';
+          });
+          str += '</select></div></div>';
+          // 参数类型
+          str += '<div class="span6 control-group"><label class="control-label" for="parameterType" style="margin-left: 20px">参数类型</label><div class="controls" style="text-align: right">'
+              + ' <input id="parameterType" type="text" placeholder="可选填"/>'
+              + ' </div></div>';
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+          str = '';
+          // 查询方式
+          str += '<div class="span6 control-group"><label class="control-label" for="selectType" style="margin-left: 20px">查询方式</label><div class="controls" style="text-align: right">'
+              + ' <select id="selectType" style="width: 164px"'
+              + (row && row.type && row.type !== 'SELECT' ? ' disabled ' : '')
+              + '>'
+          var options = [{name: "请选择查询类型", value: ""}, {name: "ONE", value: "ONE"}, {
+            name: "LIST",
+            value: "LIST"
+          }, {name: "PAGE", value: "PAGE"}]
+          options.forEach(function (item) {
+            str += '<option value="' + item.value + '">' + item.name + '</option>';
+          });
+          str += '</select></div></div>';
+          // id
+          if (type === 'UPDATE') {
+            str += '<div class="span6 control-group"><label class="control-label" for="id" style="margin-left: 20px">ID</label><div class="controls" style="text-align: right">'
+                + ' <input id="id" type="text" disabled/>'
+                + ' </div></div>';
+          }
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+          $("#modalBody").append(
+              '<div class="row-fluid"><div class="span6 control-group"><label class="control-label" for="value" style="margin-left: 20px">SQL语句:</label></div>');
+          str = '';
+          // SQL语句
+          str += '<div class="controls" style="border-left:1px solid #E5E5E5;padding-left: 20px">'
+              + ' <textarea id="value" required name="value"></textarea>'
+              + ' </div></div>';
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+          var editor = CodeMirror.fromTextArea(document.getElementById('value'), {
+            extraKeys: {"Tab": "autocomplete"},//输入s然后ctrl就可以弹出选择项
+            mode: "text/x-sql",
+            lineNumbers: false,
+            showCursorWhenSelecting: true,
+            indentUnit: 4,         // 缩进单位为4
+//                  styleActiveLine: true, // 当前行背景高亮
+            matchBrackets: true,   // 括号匹配
+            lineWrapping: true,    // 自动换行
+//                  autoRefresh:true,
+          });
+          operation.index.setCodeMirror(editor);
+          if (type === "UPDATE") {
+            editor.setValue(row["value"]);
+            setTimeout(function () {
+              editor.refresh();
+            }, 500);
+          }
+          str = '';
+        } else if (configType === 'api') {
+          // api处理--name
+          str += '<div class="span6 control-group"><label class="control-label" for="name" style="margin-left: 20px">API名称</label><div class="controls" style="text-align: right">'
+              + ' <input id="name" type="text" required placeholder="请填写API名称"/>'
+              + ' </div></div>';
+          // groupId
+          str += '<div class="span6 control-group"><label class="control-label" for="groupId" style="margin-left: 20px">组名</label><div class="controls" style="text-align: right">'
+              + ' <input id="groupId" type="text" required placeholder="请填写组名"/>'
+              + ' </div></div>';
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+          str = '';
+          // type
+          str += '<div class="span6 control-group"><label class="control-label" for="type" style="margin-left: 20px">API类型</label><div class="controls" style="text-align: right">'
+              + ' <select id="type" style="width: 164px" onchange="selectOnchang(this)">'
+          var options = [{name: "请选择API类型", value: ""}, {name: "BASE", value: "BASE"}, {
+            name: "RESTFUL",
+            value: "RESTFUL"
+          }]
+          options.forEach(function (item) {
+            str += '<option value="' + item.value + '">' + item.name + '</option>';
+          });
+          str += '</select></div></div>';
+          // url
+          str += '<div class="span6 control-group"><label class="control-label" for="url" style="margin-left: 20px">路径</label><div class="controls" style="text-align: right">'
+              + ' <input id="url" type="text" required placeholder="restful风格忽略"'
+              + (row && row.type && row.type === 'RESTFUL' ? ' disabled ' : '')
+              // + (row && row.type && row.type === 'BASE' ? ' required ' : '')
+              + ' />'
+              + ' </div></div>';
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+          str = '';
+          // bean
+          str += '<div class="span6 control-group"><label class="control-label" for="bean" style="margin-left: 20px">数据类型</label><div class="controls" style="text-align: right">'
+              + ' <input id="bean" type="text" required placeholder="base风格忽略" '
+              + (row && row.type && row.type === 'BASE' ? ' disabled ' : '')
+              // + (row && row.type && row.type === 'RESTFUL' ? ' required ' : '')
+              + ' />'
+              + ' </div></div>';
+          // primaryKey
+          str += '<div class="span6 control-group"><label class="control-label" for="primaryKey" style="margin-left: 20px">主键名</label><div class="controls" style="text-align: right">'
+              + ' <input id="primaryKey" type="text" placeholder="可选填"/>'
+              + ' </div></div>';
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+          str = '';
+          // id
+          if (type === 'UPDATE') {
+            str += '<div class="span6 control-group"><label class="control-label" for="id" style="margin-left: 20px">ID</label><div class="controls" style="text-align: right">'
+                + ' <input id="id" type="text" disabled/>'
+                + ' </div></div>';
+          }
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+          str = '';
+          // 最后一行
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+        }
+        // id
+        if (type === 'UPDATE') {
+          str += '<div class="span6 control-group" hidden><label class="control-label" for="id" style="margin-left: 20px">ID</label><div class="controls" style="text-align: right">'
+              + ' <input id="id" type="text" disabled/>'
+              + ' </div></div>';
+        }
+        // 编辑时将内容放进去
+        if (type === "UPDATE") {
+          $("#modalBody #id").val(row["id"]);
+          if (configType === 'sql') {
+            $("#modalBody #resultType").val(row["resultType"]);
+            $("#modalBody #selectType").val(row["selectType"]);
+            $("#modalBody #parameterType").val(row["parameterType"]);
+            $("#modalBody #type").val(row["type"]);
+          } else if (configType === 'api') {
+            $("#modalBody #name").val(row["name"]);
+            $("#modalBody #groupId").val(row["groupId"]);
+            $("#modalBody #url").val(row["url"]);
+            $("#modalBody #type").val(row["type"]);
+            $("#modalBody #bean").val(row["bean"]);
+            $("#modalBody #primaryKey").val(row["primaryKey"]);
+          }
+        }
+      },
+      renderModal: function (type, row) {
+        $("#modalBody").empty();
+        var sql = operation.index.getSql(type);
+        var dataPickerArray = operation.index.getDataPicker();
+        if (sql && sql.params && sql.params.length > 0) {
+          var str = '';
+          var apiTypeFlag = operation.index.getApi().type === "RESTFUL";
+          var primaryKey = operation.index.getApi().primaryKey;
+          var paramArray = sql.params.slice().reverse();
+          paramArray.forEach(function (param, key) {
+            if (param.relate) {
+              var api = operation.index.getApiByName(param.relate);
+              var pk = (api && api.primaryKey) || "id";
+              var field = param.relateField || pk;
+              getAllApiData(param.relate, function (apiDataArr) {
+                var str = '<option value="">请选择' + param.name + '</option>';
+                apiDataArr.forEach(function (item) {
+                  str += '<option value="' + item[pk] + '">' + item[field]
+                      + '</option>';
+                })
+                $("#modalBody select#" + param.name).html(str);
+                type === "UPDATE" && $("#modalBody #" + param.name).val(row[param.name]);
+              })
+            }
+            if (param.enums && param.enums.indexOf("") === -1) {
+              param.enums = [""].concat(param.enums);
+            }
+            var desc = param.desc ? param.desc : "请输入" + param.name;
+            var alias = param.alias ? param.alias : param.name;
+            var required = param.required === true ? "required" : "";
+            var formType = (param.enums || param.relate) ? 'select' : 'input';
+            if (param.javaType && param.javaType.indexOf("Date") !== -1) {
+              formType = 'date';
+            }
+            // datePicker处理
+            if (formType === 'date') {
+              if (dataPickerArray.indexOf("#modalBody #" + param.name) === -1) {
+                dataPickerArray.push("#modalBody #" + param.name);
+              }
+            }
+            operation.index.setDataPicker(dataPickerArray);
+            if (formType === 'input') {
+              str += '<div class="span6 control-group">'
+                  + ' <label class="control-label" for="' + param.name
+                  + '" style="margin-left: 20px">' + alias
+                  + '</label>'
+                  + ' <div class="controls" style="text-align: right">'
+                  + (type === "UPDATE" ?
+                      ' <input id="' + param.name + '" ' + required + ' type="text" placeholder="'
+                      + desc + '"  '
+                      + (apiTypeFlag && param.name
+                      === primaryKey ? ' disabled ' : '')
+                      + ' />' :
+                      ' <input id="' + param.name + '" ' + required + ' type="text" placeholder="'
+                      + desc + '"/>')
+                  + ' </div>'
+                  + '</div>';
+            } else if (formType === 'select') {
+              str += '<div class="span6 control-group">'
+                  + ' <label class="control-label" for="' + param.name
+                  + '" style="margin-left: 20px">' + alias
+                  + '</label>'
+                  + ' <div class="controls" style="text-align: right">';
+              if (type === "UPDATE") {
+                str += '<select id="' + param.name + '" style="width: 164px" ' + (apiTypeFlag
+                && param.name
+                === primaryKey ? ' disabled ' : '') + '">';
+              } else {
+                str += '<select id="' + param.name + '" style="width: 164px">';
+              }
+              param.enums && param.enums.length > 0 && param.enums.forEach(function (item) {
+                if (item === "") {
+                  str += '<option value="">' + '请选择' + param.name + '</option>';
+                } else {
+                  str += '<option value="' + item + '">' + item + '</option>';
+                }
+              });
+              str += '</select>' + ' </div>' + '</div>';
+            } else if (formType === 'date') {
+              str += '<div class="span6 control-group">'
+                  + ' <label class="control-label" for="' + param.name
+                  + '" style="margin-left: 20px">' + alias
+                  + '</label>'
+                  + ' <div class="input-append input-group date" style="float: right;">'
+                  + ' <input type="text" class="form-control" style="position: relative;width: 122px;" id="'
+                  + param.name + '"  '
+                  + (type === "UPDATE" && apiTypeFlag && param.name === primaryKey
+                      ? ' disabled ' : '')
+                  + ' />'
+                  + '<span class="add-on"><span class="icon-calendar"/></span>'
+                  + ' </div>'
+                  + '</div>';
+            } else if (formType === 'text') {
+              str += '<div class="span6 control-group">'
+                  + ' <label class="control-label" for="' + param.name
+                  + '" style="margin-left: 20px">' + alias
+                  + '</label>'
+                  + ' <div class="controls" style="text-align: right">'
+                  + (type === "UPDATE" ?
+                      ' <textarea rows="3" id="' + param.name + '" ' + required + ' placeholder="'
+                      + desc + '"  '
+                      + (apiTypeFlag && param.name
+                      === primaryKey ? ' disabled ' : '')
+                      + ' />' :
+                      '<textarea rows="3" id="' + param.name + '"  ' + required + ' placeholder="'
+                      + desc + '"/>')
+                  + ' </div>'
+                  + '</div>';
+            }
+            if ((key + 1) % 2 === 0) {
+              $("#modalBody").append('<div class="row-fluid">'
+                  + str
+                  + '</div>');
+              str = '';
+            }
+          });
+          $("#modalBody").append('<div class="row-fluid">'
+              + str
+              + '</div>');
+          type === "UPDATE" && paramArray.forEach(function (param) {
+            $("#modalBody #" + param.name).val(row[param.name]);
+          });
+          dataPickerArray.forEach(function (item) {
+            $(item).datetimepicker({
+              viewMode: 'days',
+              showClear: true, //是否 工具栏显示  清空 输入框  的按钮。默认false
+              format: "YYYY-MM-DD HH:mm:ss", //时间格式
+            });
+          });
+        }
+
+      },
+      renderForm: function () {
+        $("#form").empty();
+        var stopArrays = ["number", "size", "sortName", "sortOrder"];
+        var selectSql = operation.index.getSelectSql();
+        var dataPickerArray = operation.index.getDataPicker();
+        if (selectSql) {
+          var str = '';
+          if (selectSql.params && selectSql.params.length > 0) {
+            selectSql.params.forEach(function (param, key) {
+              if (param.name && !stopArrays.includes(param.name)) {
+                if (param.relate) {
+                  var api = operation.index.getApiByName(param.relate);
+                  var primaryKey = (api && api.primaryKey) || "id";
+                  var field = param.relateField || primaryKey;
+                  getAllApiData(param.relate, function (apiDataArr) {
+                    var str = '<option value=""></option>';
+                    apiDataArr.forEach(function (item) {
+                      str += '<option value="' + item[primaryKey] + '">' + item[field]
+                          + '</option>';
+                    })
+                    $("#form select#" + param.name).html(str);
+                  })
+                }
+                if (!param.relate && param.enums && param.enums.indexOf("") === -1) {
+                  param.enums = [""].concat(param.enums);
+                }
+                var alias = param.alias ? param.alias : param.name;
+                var formType = (param.enums || param.relate) ? 'select' : 'input';
+                if (param.javaType && param.javaType.indexOf("Date") !== -1) {
+                  formType = 'date';
+                }
+                // datePicker处理
+                if (formType === 'date') {
+                  if (dataPickerArray.indexOf("#" + param.name) === -1) {
+                    dataPickerArray.push("#" + param.name);
+                  }
+                }
+                operation.index.setDataPicker(dataPickerArray);
+                if (formType === 'input') {
+                  str += " <div class='span4 control-group'> "
+                      + "<label class='control-label label-overflow' data-toggle='tooltip' title='"
+                      + param.name + "'"
+                      + "  for='" + param.name
+                      + "' style='margin-left: 10px'>" + alias
+                      + "</label>"
+                      + "<div class='controls'>"
+                      + " <input id='" + param.name + "' type='text'/>"
+                      + "</div>"
+                      + "</div>";
+                } else if (formType === 'select') {
+                  str += '<div class="span4 control-group">'
+                      + ' <label class="control-label label-overflow" data-toggle="tooltip" title="'
+                      + param.name + '" for="' + param.name
+                      + '" style="margin-left: 10px">' + alias
+                      + '</label>'
+                      + ' <div class="controls">'
+                      + '<select id="' + param.name + '" style="width: 164px">';
+                  param.enums && param.enums.length > 0 && param.enums.forEach(
+                      function (item, index) {
+                        str += '<option value="' + item + '">' + item + '</option>';
+                      });
+                  str += '</select>' + ' </div>' + '</div>';
+                } else if (formType === 'date') {
+                  str += '<div class="span4 control-group">'
+                      + ' <label class="control-label label-overflow" data-toggle="tooltip" for="'
+                      + param.name
+                      + '" style="margin-left: 10px">' + alias
+                      + '</label>'
+                      + ' <div class="input-group date input-append">'
+                      + '<input type="text" class="form-control" style="position: relative;width: 122px" id="'
+                      + param.name + '" />'
+                      + '<span class="add-on"><span class="icon-calendar"/></span>'
+                      + ' </div>'
+                      + '</div>';
+                } else if (formType === 'text') {
+                  str += '<div class="span4 control-group">'
+                      + ' <label class="control-label label-overflow" data-toggle="tooltip" for="'
+                      + param.name
+                      + '" style="margin-left: 10px">' + alias
+                      + '</label>'
+                      + ' <div class="controls">'
+                      + '<textarea rows="3" id="' + param.name + '" />'
+                      + ' </div>'
+                      + '</div>';
+                }
+                if ((key + 1) % 3 === 0) {
+                  $("#form").append("<div class='row-fluid'>" + str + "</div>");
+                  str = '';
+                }
+              }
+            });
+          }
+          $("#form").append("<div class='row-fluid'>" + str + "</div>")
+          dataPickerArray.forEach(function (item) {
+            $(item).datetimepicker({
+              viewMode: 'days',
+              showClear: true, //是否 工具栏显示  清空 输入框  的按钮。默认false
+              format: "YYYY-MM-DD HH:mm:ss", //时间格式
+            });
+          });
+        }
+      },
+      renderTitle: function () {
+        var api = operation.index.getApi()
+        if (api) {
+          $("#apiTitle").text(api.type);
+        }
+      },
+      renderHeader: function () {
+        $("#header").empty();
+        // 配置api和sql这里写死,并固定在第一行最前面
+        $("#header").append(" <li class='dropdown'>"
+            + "<a class='dropdown-toggle lang' "
+            + "data-toggle='dropdown' "
+            + "data-target='#'"
+            + ">配置<b class='caret'></b>"
+            + "</a>"
+            + "<ul class='dropdown-menu' role='menu'>"
+            + "<li><a tabindex='-1' onclick='clickHeader(0)'>api</a></li>"
+            + "<li><a tabindex='-1' onclick='clickHeader(1)'>sql</a></li>"
+            + "</ul>"
+            + " </li>");
+        if (xmlConfig && xmlConfig.length > 0) {
+          var groupContainer = {}
+          xmlConfig.forEach(function (item, index) {
+            item.index = index;
+            groupContainer[item.groupId] = groupContainer[item.groupId] || [];
+            groupContainer[item.groupId].push(item);
+          });
+          var groupIds = Object.keys(groupContainer);
+          if (groupIds && groupIds.length > 0) {
+            groupIds.forEach(function (groupId) {
+              if (groupContainer[groupId]) {
+                var apiStr = '';
+                groupContainer[groupId].forEach(function (api) {
+                  apiStr += "<li><a tabindex='-1' onclick='clickHeader(" + api.index + ")'>"
+                      + api.id
+                      + "</a></li>"
+                });
+                if (groupId !== "配置") {
+                  $("#header").append(" <li class='dropdown'>"
+                      + "<a class='dropdown-toggle lang' "
+                      + "data-toggle='dropdown' "
+                      + "data-target='#'"
+                      + ">"
+                      + groupId
+                      + " <b class='caret'></b>"
+                      + "</a>"
+                      + "<ul class='dropdown-menu' role='menu'>"
+                      + apiStr
+                      + "</ul>"
+                      + " </li>");
+                }
+              }
+            });
+          }
+        }
+      },
+      renderMyTab: function (columns) {
+        var api = operation.index.getApi();
+        var tableName = (api.id || "") + "Table";
+        if (api && api.type) {
+          var url = operation.index.getUrl();
+        }
+        var selectSql = operation.index.getSelectSql();
+        if (!selectSql) {
+          return;
+        }
+        var isServerPage = selectSql.selectType === "PAGE";
+        if (isServerPage && api.type === "RESTFUL") {
+          url += url.endsWith("/") ? "page" : "/page";
+        }
+        if (api.id === 'api') {
+          url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/config/api";
+        } else if (api.id === 'sql') {
+          url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/config/sql";
+        }
+        $('#mytab').bootstrapTable("destroy").bootstrapTable({
+          url: url,         //请求后台的URL（*）
+          method: 'get',                      //请求方式（*）
+          toolbar: '#toolbar',                //工具按钮用哪个容器
+          striped: true,                      //是否显示行间隔色
+          cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+          pagination: true,                   //是否显示分页（*）
+          // sortable: true,                     //是否启用排序
+          // sortOrder: "asc",                   //排序方式
+          queryParamsType: '',//设置请求参数格式
+          queryParams: function (params) {
+            var param = {};
+            if (isServerPage) {
+              if (params.pageNumber) {
+                param.number = params.pageNumber - 1 || 0;
+              }
+              if (params.pageSize) {
+                param.size = params.pageSize;
+              }
+
+              if (params.sortName) {
+                var resultArray = selectSql.results;
+                if (resultArray && resultArray.length > 0) {
+                  var resultItem = resultArray.find(function (item) {
+                    return item.property === params.sortName;
+                  })
+                }
+                param.sortName = (resultItem && resultItem.column) ? resultItem.column
+                    : params.sortName;
+              }
+              if (params.sortOrder) {
+                param.sortOrder = params.sortOrder;
+              }
+            }
+            if (selectSql && selectSql.params && selectSql.params.length > 0) {
+              selectSql.params.forEach(function (item) {
+                if (item.name && $("#" + item.name).val() && selectSql.selectType !== "ONE") {
+                  param[item.name] = $("#" + item.name).val()
+                }
+              });
+            }
+            return param;
+          },//传递参数（*）
+          sidePagination: isServerPage ? "server" : "client",           //分页方式：client客户端分页，server服务端分页（*）
+          pageNumber: 1,                       //初始化加载第一页，默认第一页
+          pageSize: 10,                       //每页的记录行数（*）
+          pageList: [5, 10, 20, 50],        //可供选择的每页的行数（*）
+          // search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+          strictSearch: true,
+          showColumns: true,                  //是否显示所有的列
+          showRefresh: true,                  //是否显示刷新按钮
+          minimumCountColumns: 2,             //最少允许的列数
+          clickToSelect: true,                //是否启用点击选中行
+          height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+          uniqueId: operation.index.getApi().primaryKey || "id",                     //每一行的唯一标识，一般为主键列
+          showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+          cardView: false,                    //是否显示详细视图
+          detailView: false,                   //是否显示父子表
+          // clickToSelect:true,
+          showExport: true,                     //是否显示导出
+          exportDataType: "basic",              //basic', 'all', 'selected'.
+          exportOptions: {
+            // ignoreColumn: [0,12],  //忽略某一列的索引
+            fileName: tableName,  //文件名称设置
+            // worksheetName: 'sheet1',  //表格工作区名称
+            // tableName: tableName,
+            // onMsoNumberFormat: function(cell, row, col){},
+            // onCellHtmlData: function(cell, row, col, data){},
+          },
+          responseHandler: function (data) {
+            var sql = operation.index.getSelectSql();
+            var tableData = {}
+            if (data.isSuccess) {
+              if (sql.selectType === "PAGE") {
+                tableData.rows = data.data && data.data.content;
+                tableData.total = data.data && data.data.totalElements;
+              } else if (sql.selectType === "ONE") {
+                tableData = [data.data];
+              } else {
+                tableData = data.data;
+              }
+              if (!columns || columns.length === 0) {
+                var results = [];
+                var dataDemo = tableData.rows || tableData;
+                if (dataDemo && dataDemo.length > 0) {
+                  Object.keys(dataDemo[0]).forEach(function (value) {
+                    results.push({column: value, property: value})
+                  });
+                }
+                if (results.length > 0) {
+                  operation.index.renderMyTab(initMyTab(results));
+                }
+              }
+            } else {
+              tableData.rows = [];
+              tableData.total = 0;
+            }
+            return tableData;
+          },
+          columns: columns || [],
+          onLoadError: function (res) { //加载失败时执行
+            handleErrorResult(res);
+            toastr.error("表格数据加载失败");
+          },
+        });
+
+      }
+      ,
+      ajaxRequestForBasicInfo: function (handleHeader, handleForm, handleTitle,
+          handleButton, handleBreadCrumb, handleMyTab) {
+        $.ajax({
+          type: 'get',
+          url: "/operation/config/xml",
+          success: function (data) {
+            if (data && data.isSuccess) {
+              xmlConfig = [];// 先置空再存值
+              xmlConfig[0] = {
+                "id": "api",
+                "groupId": "配置",
+                "url": null,
+                "type": "RESTFUL",
+                "bean": "",
+                "sqls": [{
+                  "id": "insert",
+                  "type": "INSERT",
+                  "value": "",
+                  "params": [{
+                    "name": "name",
+                    "javaType": "java.lang.String",
+                    "alias": "API名称",
+                    "desc": "请填写API名称",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "",
+                    "index": 1
+                  }, {
+                    "name": "groupId",
+                    "javaType": "java.lang.String",
+                    "alias": "组名",
+                    "desc": "请填写组名",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "",
+                    "index": 2
+                  }, {
+                    "name": "url",
+                    "javaType": "java.lang.String",
+                    "alias": "路径",
+                    "desc": "restful风格忽略",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 3
+                  }, {
+                    "name": "type",
+                    "javaType": "com.efivestar.operation.mapping.enums.ApiType",
+                    "alias": "API类型",
+                    "desc": "请选择API类型",
+                    "conditions": null,
+                    "required": true,
+                    "enums": ["RESTFUL", "BASE"],
+                    "relate": "",
+                    "index": 4
+                  }, {
+                    "name": "bean",
+                    "javaType": "java.lang.String",
+                    "alias": "数据类型",
+                    "desc": "base风格忽略",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 5
+                  }, {
+                    "name": "primaryKey",
+                    "javaType": "java.lang.String",
+                    "alias": "主键名",
+                    "desc": "可选填",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 6
+                  }],
+                  "parameterType": "",
+                  "results": null,
+                  "selectType": null,
+                  "resultType": null
+                }, {
+                  "id": "delete",
+                  "type": "DELETE",
+                  "value": "",
+                  "params": [{
+                    "name": "id",
+                    "javaType": "java.lang.Long",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 1
+                  }],
+                  "parameterType": "",
+                  "results": null,
+                  "selectType": null,
+                  "resultType": null
+                }, {
+                  "id": "update",
+                  "type": "UPDATE",
+                  "value": "",
+                  "params": [{
+                    "name": "name",
+                    "javaType": "java.lang.String",
+                    "alias": "API名称",
+                    "desc": "请填写API名称",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "",
+                    "index": 1
+                  }, {
+                    "name": "groupId",
+                    "javaType": "java.lang.String",
+                    "alias": "组名",
+                    "desc": "请填写组名",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "",
+                    "index": 2
+                  }, {
+                    "name": "url",
+                    "javaType": "java.lang.String",
+                    "alias": "路径",
+                    "desc": "restful风格忽略",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 3
+                  }, {
+                    "name": "type",
+                    "javaType": "com.efivestar.operation.mapping.enums.ApiType",
+                    "alias": "API类型",
+                    "desc": "请选择API类型",
+                    "conditions": null,
+                    "required": true,
+                    "enums": ["RESTFUL", "BASE"],
+                    "relate": "",
+                    "index": 4
+                  }, {
+                    "name": "bean",
+                    "javaType": "java.lang.String",
+                    "alias": "数据类型",
+                    "desc": "base风格忽略",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 5
+                  }, {
+                    "name": "primaryKey",
+                    "javaType": "java.lang.String",
+                    "alias": "主键名",
+                    "desc": "可选填",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 6
+                  }, {
+                    "name": "id",
+                    "javaType": "java.lang.Long",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 7
+                  }],
+                  "parameterType": "",
+                  "results": null,
+                  "selectType": null,
+                  "resultType": null
+                }, {
+                  "id": "selectByPage",
+                  "type": "SELECT",
+                  "value": "",
+                  "params": [{
+                    "name": "id",
+                    "javaType": "java.lang.Long",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 1
+                  }, {
+                    "name": "name",
+                    "javaType": "java.lang.String",
+                    "alias": "API名称",
+                    "desc": "请填写API名称",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "",
+                    "index": 2
+                  }, {
+                    "name": "groupId",
+                    "javaType": "java.lang.String",
+                    "alias": "组名",
+                    "desc": "请填写组名",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "",
+                    "index": 3
+                  }, {
+                    "name": "url",
+                    "javaType": "java.lang.String",
+                    "alias": "路径",
+                    "desc": "restful风格忽略",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 4
+                  }, {
+                    "name": "type",
+                    "javaType": "com.efivestar.operation.mapping.enums.ApiType",
+                    "alias": "API类型",
+                    "desc": "请选择API类型",
+                    "conditions": null,
+                    "required": true,
+                    "enums": ["RESTFUL", "BASE"],
+                    "relate": "",
+                    "index": 5
+                  }, {
+                    "name": "bean",
+                    "javaType": "java.lang.String",
+                    "alias": "数据类型",
+                    "desc": "base风格忽略",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 6
+                  }, {
+                    "name": "primaryKey",
+                    "javaType": "java.lang.String",
+                    "alias": "主键名",
+                    "desc": "可选填",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 7
+                  }],
+                  "parameterType": "",
+                  "results": [{
+                    "property": "id",
+                    "column": "id",
+                    "javaType": "java.lang.Long",
+                    "tableName": "id"
+                  }, {
+                    "property": "name",
+                    "column": "name",
+                    "javaType": "java.lang.String",
+                    "tableName": "API名称"
+                  }, {
+                    "property": "groupId",
+                    "column": "group_id",
+                    "javaType": "java.lang.String",
+                    "tableName": "组名"
+                  }, {
+                    "property": "url",
+                    "column": "url",
+                    "javaType": "java.lang.String",
+                    "tableName": "路径"
+                  }, {
+                    "property": "type",
+                    "column": "type",
+                    "javaType": "com.efivestar.operation.mapping.enums.ApiType",
+                    "tableName": "API类型"
+                  }, {
+                    "property": "bean",
+                    "column": "bean",
+                    "javaType": "java.lang.String",
+                    "tableName": "数据类型"
+                  }, {
+                    "property": "primaryKey",
+                    "column": "primary_key",
+                    "javaType": "java.lang.String",
+                    "tableName": "主键名"
+                  }, {
+                    "property": "createdBy",
+                    "column": "created_by",
+                    "javaType": "java.lang.String",
+                    "tableName": "创建人"
+                  }, {
+                    "property": "createTime",
+                    "column": "create_Time",
+                    "javaType": "java.util.Date",
+                    "tableName": "创建时间"
+                  }, {
+                    "property": "lastModifiedBy",
+                    "column": "last_modified_by",
+                    "javaType": "java.lang.String",
+                    "tableName": "修改人"
+                  }, {
+                    "property": "lastModifiedTime",
+                    "column": "last_modified_time",
+                    "javaType": "java.util.Date",
+                    "tableName": "修改时间"
+                  }],
+                  "selectType": "PAGE",
+                  "resultType": ""
+                }],
+                "prefix": "operation",
+                "primaryKey": "id"
+              };
+              xmlConfig[1] = {
+                "id": "sql",
+                "groupId": "配置",
+                "url": null,
+                "type": "RESTFUL",
+                "bean": "",
+                "sqls": [{
+                  "id": "insert",
+                  "type": "INSERT",
+                  "value": "",
+                  "params": [{
+                    "name": "type",
+                    "javaType": "",
+                    "alias": "SQL类型",
+                    "desc": "请选择SQL类型",
+                    "conditions": null,
+                    "required": true,
+                    "enums": ["UPDATE", "DELETE", "INSERT", "SELECT", "UNKNOWN"],
+                    "relate": "",
+                    "index": 1
+                  }, {
+                    "name": "value",
+                    "javaType": "java.lang.String",
+                    "alias": "SQL语句",
+                    "desc": "请填写SQL语句",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "",
+                    "index": 2
+                  }, {
+                    "name": "parameterType",
+                    "javaType": "java.lang.String",
+                    "alias": "参数类型",
+                    "desc": "请填写全限定类名",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 3
+                  }, {
+                    "name": "selectType",
+                    "javaType": "com.efivestar.operation.mapping.enums.SelectType",
+                    "alias": "查询方式",
+                    "desc": "请选择查询类型",
+                    "conditions": null,
+                    "required": true,
+                    "enums": ["ONE", "LIST", "PAGE"],
+                    "relate": "",
+                    "index": 4
+                  }, {
+                    "name": "resultType",
+                    "javaType": "java.lang.String",
+                    "alias": "返回类型",
+                    "desc": "请填写返回类型",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 5
+                  }, {
+                    "name": "apiId",
+                    "javaType": "java.lang.Long",
+                    "alias": "API",
+                    "desc": "请选择对应的API",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "api",
+                    "relateField": "name",
+                    "index": 6
+                  }],
+                  "parameterType": "",
+                  "results": null,
+                  "selectType": null,
+                  "resultType": null
+                }, {
+                  "id": "delete",
+                  "type": "DELETE",
+                  "value": "",
+                  "params": [{
+                    "name": "id",
+                    "javaType": "java.lang.Long",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 1
+                  }],
+                  "parameterType": "",
+                  "results": null,
+                  "selectType": null,
+                  "resultType": null
+                }, {
+                  "id": "update",
+                  "type": "UPDATE",
+                  "value": "",
+                  "params": [{
+                    "name": "type",
+                    "javaType": "",
+                    "alias": "SQL类型",
+                    "desc": "请选择SQL类型",
+                    "conditions": null,
+                    "required": true,
+                    "enums": ["UPDATE", "DELETE", "INSERT", "SELECT", "UNKNOWN"],
+                    "relate": "",
+                    "index": 1
+                  }, {
+                    "name": "value",
+                    "javaType": "java.lang.String",
+                    "alias": "SQL语句",
+                    "desc": "请填写SQL语句",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "",
+                    "index": 2
+                  }, {
+                    "name": "parameterType",
+                    "javaType": "java.lang.String",
+                    "alias": "参数类型",
+                    "desc": "请填写全限定类名",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 3
+                  }, {
+                    "name": "selectType",
+                    "javaType": "com.efivestar.operation.mapping.enums.SelectType",
+                    "alias": "查询方式",
+                    "desc": "请选择查询类型",
+                    "conditions": null,
+                    "required": true,
+                    "enums": ["ONE", "LIST", "PAGE"],
+                    "relate": "",
+                    "index": 4
+                  }, {
+                    "name": "resultType",
+                    "javaType": "java.lang.String",
+                    "alias": "返回类型",
+                    "desc": "请填写返回类型",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 5
+                  }, {
+                    "name": "apiId",
+                    "javaType": "java.lang.Long",
+                    "alias": "API",
+                    "desc": "请选择对应的API",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "api",
+                    "relateField": "name",
+                    "index": 6
+                  }, {
+                    "name": "id",
+                    "javaType": "java.lang.Long",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 7
+                  }],
+                  "parameterType": "",
+                  "results": null,
+                  "selectType": null,
+                  "resultType": null
+                }, {
+                  "id": "selectByPage",
+                  "type": "SELECT",
+                  "value": "",
+                  "params": [{
+                    "name": "id",
+                    "javaType": "java.lang.Long",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 1
+                  }, {
+                    "name": "type",
+                    "javaType": "com.efivestar.operation.mapping.enums.SqlType",
+                    "alias": "SQL类型",
+                    "desc": "请选择SQL类型",
+                    "conditions": null,
+                    "required": true,
+                    "enums": ["UPDATE", "DELETE", "INSERT", "SELECT", "UNKNOWN"],
+                    "relate": "",
+                    "index": 2
+                  }, {
+                    "name": "parameterType",
+                    "javaType": "java.lang.String",
+                    "alias": "参数类型",
+                    "desc": "请填写全限定类名",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 3
+                  }, {
+                    "name": "selectType",
+                    "javaType": "com.efivestar.operation.mapping.enums.SelectType",
+                    "alias": "查询方式",
+                    "desc": "请选择查询类型",
+                    "conditions": null,
+                    "required": true,
+                    "enums": ["ONE", "LIST", "PAGE"],
+                    "relate": "",
+                    "index": 4
+                  }, {
+                    "name": "resultType",
+                    "javaType": "java.lang.String",
+                    "alias": "返回类型",
+                    "desc": "请填写返回类型",
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": "",
+                    "index": 5
+                  }, {
+                    "name": "apiId",
+                    "javaType": "java.lang.Long",
+                    "alias": "API",
+                    "desc": "请选择对应的API",
+                    "conditions": null,
+                    "required": true,
+                    "enums": null,
+                    "relate": "api",
+                    "relateField": "name",
+                    "index": 6
+                  }, {
+                    "name": "sortName",
+                    "javaType": "java.lang.Object",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 7
+                  }, {
+                    "name": "sortOrder",
+                    "javaType": "java.lang.Object",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 8
+                  }, {
+                    "name": "number",
+                    "javaType": "java.lang.Object",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 9
+                  }, {
+                    "name": "size",
+                    "javaType": "java.lang.Object",
+                    "alias": null,
+                    "desc": null,
+                    "conditions": null,
+                    "required": false,
+                    "enums": null,
+                    "relate": null,
+                    "index": 10
+                  }],
+                  "parameterType": "",
+                  "results": [{
+                    "property": "id",
+                    "column": "id",
+                    "javaType": "java.lang.Long",
+                    "tableName": "id"
+                  }, {
+                    "property": "type",
+                    "column": "type",
+                    "javaType": "com.efivestar.operation.mapping.enums.SqlType",
+                    "tableName": "SQL类型"
+                  }, {
+                    "property": "value",
+                    "column": "value",
+                    "javaType": "java.lang.String",
+                    "tableName": "SQL语句"
+                  }, {
+                    "property": "parameterType",
+                    "column": "parameter_type",
+                    "javaType": "java.lang.String",
+                    "tableName": "参数类型"
+                  }, {
+                    "property": "selectType",
+                    "column": "select_type",
+                    "javaType": "com.efivestar.operation.mapping.enums.SelectType",
+                    "tableName": "查询方式"
+                  }, {
+                    "property": "resultType",
+                    "column": "result_type",
+                    "javaType": "java.lang.String",
+                    "tableName": "返回类型"
+                  }, {
+                    "property": "apiName",
+                    "column": "",
+                    "javaType": "java.lang.String",
+                    "tableName": "API"
+                  }, {
+                    "property": "createdBy",
+                    "column": "created_by",
+                    "javaType": "java.lang.String",
+                    "tableName": "创建人"
+                  }, {
+                    "property": "createTime",
+                    "column": "create_Time",
+                    "javaType": "java.util.Date",
+                    "tableName": "创建时间"
+                  }, {
+                    "property": "lastModifiedBy",
+                    "column": "last_modified_by",
+                    "javaType": "java.lang.String",
+                    "tableName": "修改人"
+                  }, {
+                    "property": "lastModifiedTime",
+                    "column": "last_modified_time",
+                    "javaType": "java.util.Date",
+                    "tableName": "修改时间"
+                  }],
+                  "selectType": "PAGE",
+                  "resultType": ""
+                }],
+                "prefix": "operation",
+                "primaryKey": "id"
+              };
+              if (data.data && data.data.length > 0) {
+                xmlConfig = xmlConfig.concat(data.data);
+              }
+              handleTitle && handleTitle();
+              handleHeader && handleHeader();
+              if (xmlConfig && xmlConfig[index]) {
+                handleForm && handleForm();
+                handleButton && handleButton();
+                handleBreadCrumb && handleBreadCrumb();
+                handleMyTab && handleMyTab(initMyTab());
+              }
+            }
+
+          },
+          error: function (error) {
+            handleErrorResult(error);
+            toastr.error("获取配置信息失败");
+          },
+        });
+      }
+    }
+  }();
+
+  $(document).ready(function () {
+    operation.index.init();
+  });
+
+  function clickDelete(id) {
+    var api = operation.index.getApi();
+    var url = operation.index.getUrl();
+    if (api.id === 'api') {
+      url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/config/api";
+    } else if (api.id === 'sql') {
+      url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/config/sql";
+    }
+    if (id) {
+      $.ajax({
+        type: "delete",
+        url: url + "/" + id,
+        success: function (data) {
+          if (data && data.isSuccess) {
+            toastr.success("删除成功");
+            $("#mytab").bootstrapTable("refresh");
+            reloadConfig();
+          } else {
+            toastr.error("删除失败" + data ? data.message : "");
+          }
+        },
+        error: function (e) {
+          handleErrorResult(e);
+          toastr.error("删除失败" + getErrorMsg(e));
+        }
+      })
+    } else {
+      toastr.error("删除失败,id不存在");
+    }
+  }
+
+  function clickHeader(index) {
+    operation.index.setIndex(index);
+    operation.index.renderForm();
+    operation.index.renderTitle();
+    operation.index.renderButton();
+    operation.index.renderBreadCrumb();
+    $("#tableBody").empty();
+    operation.index.renderMyTab(initMyTab());
+  }
+
+  function clickAddBtn(type) {
+    operation.index.clickAdd(type);
+  }
+
+  function clickSearchBtn() {
+    var selectSql = operation.index.getSelectSql();
+    var api = operation.index.getApi();
+    var url = operation.index.getUrl();
+    if (selectSql.selectType
+        === "ONE" && api.type === "RESTFUL") {
+      url += url.endsWith("/") ? "" : "/";
+      var paramName = selectSql.params[0].name;
+      if (paramName) {
+        url += $("#" + paramName).val();
+      }
+      if (api.id === 'api') {
+        url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/config/api";
+      } else if (api.id === 'sql') {
+        url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/config/sql";
+      }
+      $("#mytab").bootstrapTable("refreshOptions", {pageNumber: 1, url: url});
+      return;
+    }
+    $("#mytab").bootstrapTable("refreshOptions", {pageNumber: 1});
+  }
+
+  function initMyTab(results) {
+    var sql = operation.index.getSelectSql();
+    if (!sql) {
+      $("#mytab").bootstrapTable("destroy");
+      return;
+    }
+    var api = operation.index.getApi();
+    var primaryKey = api.primaryKey || "id";
+    var columns = [];
+    var resultsArray = results || sql.results;
+    if (resultsArray.length > 0) {
+      resultsArray.forEach(function (result) {
+        columns.push({
+          field: result.property,
+          title: result.tableName || result.column,
+          align: 'center',
+          sortable: true,
+        });
+      });
+      var updateSql = operation.index.getUpdateSql();
+      var deleteSql = operation.index.getDeleteSql();
+      if (columns.length > 0 && (updateSql || deleteSql)) {
+        if (api.id === "api" || api.id === "sql") {
+          // 写死的modal处理
+          columns.push({
+            field: 'operation',
+            title: '操作列',
+            // width: 120,
+            align: 'center',
+            valign: 'middle',
+            formatter: actionFormatter,
+            events: {
+              'click .edit': function (e, value, row, index) {
+                if (api.id === "api") {
+                  operation.index.clickEdit(row, 1);
+                } else if (api.id === "sql") {
+                  operation.index.clickEdit(row, 2);
+                }
+              }
+            }
+          })
+        } else {
+          columns.push({
+            field: 'operation',
+            title: '操作列',
+            // width: 120,
+            align: 'center',
+            valign: 'middle',
+            formatter: actionFormatter,
+            events: {
+              'click .edit': function (e, value, row, index) {
+                operation.index.clickEdit(row, 3);
+              }
+            }
+          })
+        }
+
+        function actionFormatter(value, row, index) {
+          var id = value || row[primaryKey];
+          var result = "";
+          result += updateSql
+              ? '<a  class="edit" style="color:orange" data-toggle="modal" data-target="#myModal">编辑</a>'
+              : '';
+          result += deleteSql
+              ? '<a class="delete" style="color: red;margin-left: 10px;" onclick="clickDelete('
+              + id
+              + ')">删除</a>' : '';
+          if (result) {
+            return "<div style='width: 100px;margin:auto;'>" + result + "</div>";
+          }
+          return "";
+        }
+      }
+      return columns;
+    }
+  }
+
+  function renderTasks(tasks) {
+    if (tasks && tasks.length > 0) {
+      var str = '';
+      tasks.forEach(function (task) {
+        str += '<li>' +
+            '<div style = "height: 34px;width:400px;border-radius: 0px;margin-bottom:0px;"' +
+            ' class = "progress ' + (!task.downloadUrl && task.exportStatusEnum === "exported"
+                ? 'progress-danger' : '')
+            + ' progress-striped active" > ' +
+            '<div class= "bar" style = "width: ' + task.progress
+            + '%;opacity:0.5;line-height: 34px" >' +
+            '<div class="row-fluid" style="width: 400px">' +
+            '<div class= "span4" >' + task.apiName + '</div>' +
+            '<div class="span4" >' + task.createTime + '</div>' +
+            '<div class= "span4">' +
+            (task.downloadUrl ? '<a href = ' + task.downloadUrl
+                + ' style ="padding:0px 0px;display: inline-block;color: #387038;">下载</a>('
+                + task.fileSize + 'KB)'
+                : task.exportStatusEnum === "exported" ? '<span style="color: red">下载失败</span>'
+                    : '') +
+            (task.exportStatusEnum === "exported"
+                ? '<span class="icon-remove" style="float:right;margin-right: 3px;margin-top: 10px;cursor:pointer;" onclick="deleteTask('
+                + task.id + ')"></span>' : '') +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</li>'
+      });
+      $("#taskList").html(str);
+    } else {
+      $("#taskList").html('<li style="text-align: center">空空如也</li>');
+    }
+
+  }
+
+  function renderAccount() {
+    var account = window.localStorage.getItem(operation.index.getAccountKey());
+    if (account) {
+      $("#accountName").text(account);
+    }
+  }
+
+  function downloadExport() {
+    var api = operation.index.getApi();
+    var url = ''
+    if (api) {
+      if (api.id === "api" || api.id === "sql") {
+        toastr.error("无法下载");
+        return;
+      }
+      var prefix = api.prefix;
+      url += (prefix.startsWith("/") ? "" : "/") + prefix + "/export/" + api.id
+          + "/excel?";
+    } else {
+      toastr.error("下载文件失败");
+      return;
+    }
+    var selectSql = operation.index.getSelectSql();
+    var params = [];
+    if (selectSql && selectSql.params && selectSql.params.length > 0) {
+      selectSql.params.forEach(function (item) {
+        if (item.name && $("#" + item.name).val()) {
+          params.push(item.name + "=" + $("#" + item.name).val())
+        }
+      });
+    }
+    if (params.length > 0) {
+      url += params.join("&");
+    }
+    $.ajax({
+      type: 'get',
+      dataType: 'json',
+      url: url,
+      success: function (data) {
+        if (data && data.isSuccess) {
+          toastr.success("下载文件成功");
+        } else {
+          toastr.error("下载文件失败");
+        }
+      },
+      error: function (e) {
+        handleErrorResult(e);
+        toastr.error("下载文件失败" + getErrorMsg(e));
+      }
+    });
+  }
+
+  function deleteTask(id) {
+    var api = operation.index.getApi();
+    if (!api) {
+      return;
+    }
+    var url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/export/task/" + id;
+    $.ajax({
+      type: "delete",
+      url: url,
+      success: function (data) {
+        if (data && data.isSuccess) {
+          findTasks();
+        } else {
+          toastr.error("删除任务失败");
+        }
+      },
+      error: function (e) {
+        handleErrorResult(e);
+        toastr.error("删除任务失败" + getErrorMsg(e));
+      },
+    });
+  }
+
+  function findTasks() {
+    var api = operation.index.getApi();
+    if (!api) {
+      return;
+    }
+    var url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/export/tasks";
+    $.ajax({
+      type: "get",
+      url: url,
+      success: function (data) {
+        if (data && data.isSuccess) {
+          renderTasks(data.data);
+        } else {
+          toastr.error("获取任务列表失败");
+        }
+      },
+      error: function (e) {
+        handleErrorResult(e);
+        toastr.error("获取任务列表失败" + getErrorMsg(e));
+      },
+    });
+  }
+
+  function getErrorMsg(e) {
+    var message = ""
+    try {
+      var res = JSON.parse(e.responseText);
+      if (res && res.message) {
+        message = res.message;
+      }
+    } catch (e) {
+      message = "";
+    }
+    return message ? ": " + message : "";
+  }
+
+  function handleErrorResult(e) {
+    if (e && e.status == 401 || e === 401) {
+      window.localStorage.removeItem(operation.index.getAccountKey());
+      location.href = "login.html";
+    }
+  }
+
+  function selectOnchang(obj) {
+    //获取被选中的option标签选项
+    if (obj.selectedIndex === 1) {//BASE
+      $('#modalBody #url').removeAttr("disabled");
+      $('#modalBody #bean').attr("disabled", true);
+      $('#modalBody #bean').attr("value", "");
+    } else if (obj.selectedIndex === 2) {//RESTFUL
+      $('#modalBody #bean').removeAttr("disabled");
+      $('#modalBody #url').attr("disabled", true);
+      $('#modalBody #url').attr("value", "");
+    } else {
+      $('#modalBody #bean').removeAttr("disabled");
+      $('#modalBody #url').removeAttr("disabled");
+    }
+  }
+
+  function selectOnchangSql(obj) {
+    if (obj.selectedIndex === 4) {//SELECT
+      $('#modalBody #selectType').removeAttr("disabled");
+      $('#modalBody #resultType').removeAttr("disabled");
+    } else {//其他
+      $('#modalBody #selectType').attr("disabled", true);
+      $('#modalBody #selectType').attr("value", "");
+      $('#modalBody #resultType').attr("disabled", true);
+      $('#modalBody #resultType').attr("value", "");
+    }
+  }
+
+  function getAllApiData(apiName, callback) {
+    var api = operation.index.getApiByName(apiName)
+    if (!api) {
+      return;
+    }
+    var url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix;
+    if (apiName === "sql" || apiName === "api") {
+      url += ("/config/" + apiName
+          + "?number=0&size=10000");
+    } else if (api.type === "RESTFUL") {
+      url += "/rest/" + apiName;
+      var sqls = api.sqls;
+      if (!sqls || sqls.length === 0) {
+        return;
+      }
+      var sql = sqls.find(function (item) {
+        return item.selectType === "PAGE";
+      });
+      if (sql) {
+        url += "?number=0&size=10000";
+      }
+    } else if (api.type === "BASE") {
+      var sqls = api.sqls;
+      if (!sqls || sqls.length === 0) {
+        return;
+      }
+      var sql = sqls[0];
+      if (sql.type === "SELECT") {
+        url += "/" + apiName + api.url || "";
+      } else {
+        return;
+      }
+      if (sql.selectType === "PAGE") {
+        url += "?number=0&size=10000";
+      }
+    } else {
+      return;
+    }
+    $.ajax({
+      type: "get",
+      url: url,
+      success: function (data) {
+        if (data && data.isSuccess) {
+          var dataArr = data.data.content || data.data;
+          if (dataArr && dataArr.length > 0) {
+            callback(dataArr);
+          }
+        }
+      },
+      error: function (e) {
+        handleErrorResult(e);
+        toastr.error("获取" + apiName + "列表失败" + getErrorMsg(e));
+      },
+    });
+  }
+
+  function reloadConfig() {
+    var api = operation.index.getApi();
+    if (api.id === "sql" || api.id === "api") {
+      operation.index.init();
+    }
+  }
+
+  function clickModalOk() {
+    var editor = operation.index.getCodeMirror();
+    if ($("#myModalLabel").text() === '编辑api配置' || $("#myModalLabel").text() === '新增api配置') {
+      if (!$("#modalBody #name").val() || $("#modalBody #name").val() === '') {
+        toastr.error("名称不能为空");
+        return;
+      }
+      if (!$("#modalBody #groupId").val() || $("#modalBody #groupId").val() === '') {
+        toastr.error("组名不能为空");
+        return;
+      }
+      if (!$("#modalBody #type").val() || $("#modalBody #type").val() === '') {
+        toastr.error("API类型不能为空");
+        return;
+      }
+      if ($("#modalBody #type").val() === "RESTFUL") {
+        if (!$("#modalBody #bean").val() || $("#modalBody #bean").val() === '') {
+          toastr.error("数据类型不能为空");
+          return;
+        }
+      }
+      if ($("#modalBody #type").val() === "BASE") {
+        if (!$("#modalBody #url").val() || $("#modalBody #url").val() === '') {
+          toastr.error("路径不能为空");
+          return;
+        }
+      }
+    } else if ($("#myModalLabel").text() === '编辑sql配置' || $("#myModalLabel").text()
+        === '新增sql配置') {
+      if (!editor.getValue() || editor.getValue() === '') {
+        toastr.error("SQL语句不能为空");
+        return;
+      }
+    }
+    var prefix = "#modalBody ";
+    var api = operation.index.getApi();
+    var url = operation.index.getUrl();
+    if (api.id === 'api') {
+      url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/config/api";
+    } else if (api.id === 'sql') {
+      url = (api.prefix.startsWith("/") ? "" : "/") + api.prefix + "/config/sql";
+    }
+    var data = {};
+    if ($("#myModalLabel").text().indexOf(operation.index.getAdd()) !== -1) {
+      var insertSql = operation.index.getInsertSql();
+      if (insertSql && insertSql.params && insertSql.params.length > 0) {
+        insertSql.params.forEach(function (param) {
+          var paramVal = $(prefix + "#" + param.name).val();
+          if (paramVal) {
+            data[param.name] = paramVal;
+          }
+        });
+        if ($("#myModalLabel").text() === '新增sql配置') {
+          data["value"] = editor.getValue();
+        }
+      }
+      $.ajax({
+        type: "post",
+        url: url,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        dataType: "json",
+        data: JSON.stringify(data),
+        success: function (data) {
+          if (data && data.isSuccess) {
+            toastr.success("新增成功");
+            $("#myModal").modal('hide');
+            $("#mytab").bootstrapTable("refresh");
+            reloadConfig();
+          } else {
+            toastr.error("新增失败" + data ? data.message : "");
+          }
+        },
+        error: function (e) {
+          handleErrorResult(e);
+          toastr.error("新增失败" + getErrorMsg(e));
+          $("#myModal").modal('hide');
+        }
+      });
+    } else if ($("#myModalLabel").text().indexOf(operation.index.getEdit()) !== -1) {
+      var updateSql = operation.index.getUpdateSql();
+      if (updateSql && updateSql.params && updateSql.params.length > 0) {
+        updateSql.params.forEach(function (param) {
+          var paramVal = $(prefix + "#" + param.name).val();
+          if (paramVal) {
+            data[param.name] = paramVal;
+          }
+        });
+        if ($("#myModalLabel").text() === '编辑sql配置') {
+          data["value"] = editor.getValue();
+        }
+      }
+      var primaryKey = (api && api.primaryKey) || "id";
+      $.ajax({
+        type: "put",
+        url: url + "/" + data[primaryKey],
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        dataType: "json",
+        data: JSON.stringify(data),
+        success: function (data) {
+          if (data && data.isSuccess) {
+            toastr.success("修改成功");
+            $("#myModal").modal('hide');
+            $("#mytab").bootstrapTable("refresh");
+            reloadConfig();
+          } else {
+            toastr.error("修改失败" + data ? data.message : "");
+          }
+        },
+        error: function (e) {
+          handleErrorResult(e);
+          toastr.error("修改失败" + getErrorMsg(e));
+          $("#myModal").modal('hide');
+        }
+      });
+    } else {
+      var api = operation.index.getApi();
+      if (api.type != "BASE") {
+        return;
+      }
+      var opSql = operation.index.getInsertSql() || operation.index.getUpdateSql()
+          || operation.index.getDeleteSql();
+      if (opSql && opSql.params && opSql.params.length > 0) {
+        opSql.params.forEach(function (param) {
+          var paramVal = $(prefix + "#" + param.name).val();
+          if (paramVal) {
+            data[param.name] = paramVal;
+          }
+        });
+      }
+      $.ajax({
+        type: "post",
+        url: url,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        dataType: "json",
+        data: JSON.stringify(data),
+        success: function (data) {
+          if (data && data.isSuccess) {
+            toastr.success("操作成功");
+            $("#myModal").modal('hide');
+            $("#mytab").bootstrapTable("refresh");
+            reloadConfig();
+          } else {
+            toastr.error("操作失败" + data ? data.message : "");
+          }
+        },
+        error: function (e) {
+          handleErrorResult(e);
+          toastr.error("操作失败" + getErrorMsg(e));
+          $("#myModal").modal('hide');
+        }
+      });
+    }
+  }
+
+  $(function () {
+    toastr.options.positionClass = 'toast-top-right';
+    $("[data-toggle='tooltip']").tooltip();
+    $(".container").on("click", "a", function (event) {
+      var target = event.target;
+      if (target && target.innerText === "MS-Excel") {
+        downloadExport();
+      }
+    });
+    $(".container").on('click', '[data-stopPropagation]', function (e) {
+      e.stopPropagation();
+    });
+    $("#taskBtn").on('click', function () {
+      findTasks();
+    });
+
+    renderAccount();
+    $("#account .dropdown-menu li").eq(0).on("click", function () {
+      $.ajax({
+        type: "get",
+        url: "logout",
+        success: function (data) {
+          if ("success" === data) {
+            window.localStorage.removeItem(operation.index.getAccountKey());
+            location.href = "login.html";
+          }
+        },
+        error: function () {
+          toastr.error("登出失败");
+        }
+      })
+    })
+    $("#collapse").on('hide', function () {
+      $("#collapseBtn").html("显示表单&nbsp;<span class='caret'></span>");
+    });
+    $("#collapse").on('show', function () {
+      $("#collapseBtn").html("隐藏表单&nbsp;<span class='caret down'></span>");
+    });
+
+    $("#collapseBtn").on('click', function (e) {
+      var collapseText = e.target.innerText ? e.target.innerText.trim() : '';
+      if (collapseText === '显示表单') {
+        $("#collapse").attr("style", "overflow:visible");
+      } else if (collapseText === '隐藏表单') {
+        $("#collapse").attr("style", "overflow:hide");
+      }
+    });
+    $("#modalOk").click(clickModalOk);
+  });
+
+</script>
+</body>
+</html>

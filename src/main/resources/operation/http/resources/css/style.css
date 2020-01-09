@@ -1,0 +1,145 @@
+
+body {
+  font-size: 12px;
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+
+a {
+  cursor: pointer;
+}
+
+#dataTable th > a {
+  color: #555555;
+}
+
+#dataTable th {
+  background-color: #E5E5E5;
+  border-bottom-color: #FFC40D;
+  color: #555555;
+  cursor: pointer;
+  text-align: center;
+}
+
+#dataTable td {
+  text-align: center;
+}
+
+#dataTable td a {
+  text-decoration: none;
+}
+
+.footer {
+  background-color: #F5F5F5;
+  border-top: 1px solid #E5E5E5;
+  margin-top: 10px;
+  padding: 20px 0;
+}
+
+.td_lable {
+  font-weight: bold;
+  width: 220px;
+  background-color: #E5E5E5;
+}
+
+.striped {
+  background-color: #fff;
+}
+
+#dataTable1 th > a {
+  color: #555555;
+}
+
+#dataTable1 th {
+  background-color: #E5E5E5;
+  border-bottom-color: #FFC40D;
+  color: #555555;
+  cursor: pointer;
+}
+
+#dataTable2 th > a {
+  color: #555555;
+}
+
+#dataTable2 th {
+  background-color: #E5E5E5;
+  border-bottom-color: #FFC40D;
+  color: #555555;
+  cursor: pointer;
+}
+
+#dataTable .edit {
+  color: orange;
+}
+
+#dataTable .delete {
+  margin-left: 10px;
+  color: red;
+}
+
+#form input {
+  width: 150px;
+}
+
+#modalBody input {
+  width: 150px;
+}
+
+#header a {
+  font-size: 14px;
+}
+
+.down {
+  border-top: 0;
+  border-bottom: 4px solid #000;
+}
+
+.breadcrumb li {
+  font-size: 14px;
+}
+
+.modal-lg {
+  width: 700px;
+  left: 44%;
+}
+
+.label-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 90px;
+}
+
+#account {
+  float: right;
+  line-height: 40px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.task {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  list-style: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  *border-right-width: 2px;
+  *border-bottom-width: 2px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box
+}
